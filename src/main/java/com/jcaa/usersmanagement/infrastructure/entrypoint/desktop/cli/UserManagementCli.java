@@ -1,12 +1,7 @@
 package com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli;
 
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.CreateUserHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.DeleteUserHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.FindUserByIdHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.ListUsersHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.LoginHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.OperationHandler;
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.UpdateUserHandler;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.*;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.ProviderController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.ConsoleIO;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.UserResponsePrinter;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.menu.MenuOption;
@@ -28,6 +23,7 @@ public final class UserManagementCli {
   private static final String MENU_BORDER = "  ==========================================";
 
   private final UserController userController;
+  private final ProviderController providerController;
   private final ConsoleIO console;
 
   public void start() {
@@ -68,14 +64,20 @@ public final class UserManagementCli {
   }
 
   private Map<MenuOption, OperationHandler> buildHandlers(final UserResponsePrinter printer) {
-    return Map.of(
-        MenuOption.LIST_USERS,  new ListUsersHandler(userController, printer),
-        MenuOption.FIND_USER,   new FindUserByIdHandler(userController, console, printer),
-        MenuOption.CREATE_USER, new CreateUserHandler(userController, console, printer),
-        MenuOption.UPDATE_USER, new UpdateUserHandler(userController, console, printer),
-        MenuOption.DELETE_USER, new DeleteUserHandler(userController, console),
-        MenuOption.LOGIN,       new LoginHandler(userController, console, printer));
-  }
+        return Map.ofEntries(
+                Map.entry(MenuOption.LIST_USERS, new ListUsersHandler(userController, printer)),
+                Map.entry(MenuOption.FIND_USER, new FindUserByIdHandler(userController, console, printer)),
+                Map.entry(MenuOption.CREATE_USER, new CreateUserHandler(userController, console, printer)),
+                Map.entry(MenuOption.UPDATE_USER, new UpdateUserHandler(userController, console, printer)),
+                Map.entry(MenuOption.DELETE_USER, new DeleteUserHandler(userController, console)),
+                Map.entry(MenuOption.LOGIN, new LoginHandler(userController, console, printer)),
+                Map.entry(MenuOption.LIST_PROVIDERS, new ListProvidersHandler(providerController, console)),
+                Map.entry(MenuOption.FIND_PROVIDER, new FindProviderByIdHandler(providerController, console)),
+                Map.entry(MenuOption.CREATE_PROVIDER, new CreateProviderHandler(providerController, console)),
+                Map.entry(MenuOption.UPDATE_PROVIDER, new UpdateProviderHandler(providerController, console)),
+                Map.entry(MenuOption.DELETE_PROVIDER, new DeleteProviderHandler(providerController, console))
+        );
+    }
 
   private void printMenu() {
     console.println();
